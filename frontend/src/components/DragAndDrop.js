@@ -1,15 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Container, Button, Card, Collapse, Fade, Form } from 'react-bootstrap'
+import { Container, Button, Card, Collapse, Fade } from 'react-bootstrap'
 import Dropzone from 'dropzone'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function DragAndDrop() {
 
   const dropFileRef = useRef(null)
   const [open, setOpen] = useState(false)
-
+  const { currentUser: {email} } = useAuth()
+  
   useEffect(() => {
-    const dropzone = new Dropzone('div#dragAndDrop', {
-      url: '/',
+    const dropzone = new Dropzone('form#dragAndDrop', {
+      url: 'http://localhost:5000/',
       previewTemplate: `
       <div class="dz-preview dz-file-preview mt-4">
         <div class="dz-details mx-auto">
@@ -21,19 +23,21 @@ export default function DragAndDrop() {
       </div>
     `,
       autoProcessQueue: false,
+      headers: {
+        "currentUserEmail": `${email}`,
+      },
     })
 
     dropFileRef.current = dropzone
 
-    dropzone.on('addedfile', (file) => console.log(file))
-
     return () => {
-      dropzone.destroy(); // Cleanup Dropzone instance if needed
+      dropzone.destroy();
     };
   }, [])
 
-  function handleUpload(e) {
-    dropFileRef.current.processQueue();
+  function handleUpload() {
+    dropFileRef.current.processQueue()  
+    console.log(dropFileRef.current.files[0])
   }
 
   function handleClick(e) {
@@ -59,15 +63,17 @@ export default function DragAndDrop() {
             className="shadow mx-auto rounded-4 w-75 h-auto position-relative"
             style={{ height: open ? "20rem" : "0rem" }}>
             <button type="button" className="btn-close position-absolute mt-2 me-2 top-0 end-0" aria-label="Close" onClick={(e) => handleClick(e)}></button>
-            <div id="dragAndDrop" style={{ height: "20rem" }}>
+            <form 
+              id="dragAndDrop" 
+              style={{ height: "20rem" }}>
               <Card.Title className="text-center text-secondary pt-4 fs-4">Drag and Drop or Click to Upload
               </Card.Title>
-            </div>
+            </form>
             <div className="d-flex w-75 mx-auto justify-content-center">
               <Button
                 variant="outline-primary"
                 className='mb-4 w-50 fs-3'
-                onChange={handleUpload}
+                onClick={handleUpload}
               >
                 Upload
               </Button>

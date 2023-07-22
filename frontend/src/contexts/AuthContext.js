@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { auth } from '../firebase'
-import { getShopkeeperName } from '../database'
 
 const AuthContext = React.createContext()
 
