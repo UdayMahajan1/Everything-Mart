@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { auth } from '../firebase'
+import { getShopkeeperName } from '../database'
 
 const AuthContext = React.createContext()
 
@@ -9,7 +10,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
 
-  async function signup(name, email, password) {
+  async function signup(email, password) {
     try {
       await auth.createUserWithEmailAndPassword(email, password)
     } catch (err) {
@@ -26,7 +27,13 @@ export function AuthProvider({ children }) {
   }
 
   const [currentUser, setCurrentUser] = useState()
+  const [name, setName] = useState()
   const [loading, setLoading] = useState(true)
+
+  async function GetShopkeeperName(currentUser) {
+    let name = await getShopkeeperName(currentUser)
+    return setName(name)
+  }
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -42,6 +49,8 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
+    name, 
+    GetShopkeeperName
   }
 
   return (

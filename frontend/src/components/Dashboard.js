@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Navbar, Button, Form, Fade } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
-import { getShopkeeperName } from '../database'
 import DragAndDrop from './DragAndDrop'
+import InvoiceTable from './InvoiceTable'
 
 export default function Dashboard() {
 
-  const { logout, currentUser: { email } } = useAuth()
-  const [username, setUsername] = useState('')
+  const { logout, currentUser: { email }, GetShopkeeperName, name } = useAuth()
+  var username = name;
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    getShopkeeperName(email).then((name) => {
+    async function handleName() {
+      let name = await GetShopkeeperName(email)
       setOpen(true)
-      setUsername(name)
-    })
+      return name
+    }
+    handleName()
   })
 
   async function handleLogout() {
@@ -38,7 +40,8 @@ export default function Dashboard() {
           </Form>
           </Container>
         </Navbar>
-        <DragAndDrop />
+        <DragAndDrop />        
+        <InvoiceTable />
       </div>
     </>
   )
